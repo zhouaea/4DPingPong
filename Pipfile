@@ -6,7 +6,7 @@ name = "pypi"
 [packages]
 numpy = "*"
 opencv-python = "*"
-keyboard = "*"
+pynput = "*"
 
 [dev-packages]
 

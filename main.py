@@ -3,7 +3,7 @@
 # https://www.analyticsvidhya.com/blog/2020/03/ball-tracking-cricket-computer-vision/, segmenting a circle
 # https://www.geeksforgeeks.org/filter-color-with-opencv/, process of color filtering
 # http://people.ece.cornell.edu/land/courses/ece5760/FinalProjects/s2015/ttt/ttt/ttt/index.html, tracking game state
-
+import time
 
 import cv2 as cv
 import numpy as np
@@ -12,7 +12,9 @@ from collections import deque
 from enum import Enum, auto
 from math import pi
 
-videoCapture = cv.VideoCapture(0)
+videoCapture = cv.VideoCapture("3.mp4")
+cv.namedWindow("circle", cv.WND_PROP_FULLSCREEN)
+cv.setWindowProperty("circle", cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
 
 
 # Constants
@@ -63,7 +65,7 @@ def ballCheck(contour):
     area = cv.contourArea(contour)
     circularity = 4 * pi * (area / (perimeter * perimeter))
 
-    if area <= 100 or area >= 400:
+    if area <= 0 or area >= 200:
         rightSize = False
     else:
         rightSize = True
@@ -106,6 +108,7 @@ def detectBounce():
         down_up_array.append(downOrUp(ballPositions[i], ballPositions[i + 1]))
 
     bounced = down_up_array == [-1, -1, -1, 0, 0, 0]
+    print(down_up_array)
 
     if bounced:
         print("ball bounced")
@@ -139,12 +142,14 @@ while True:
 
     # Filter by orange
     hsv = cv.cvtColor(blurFrame, cv.COLOR_BGR2HSV)
-    lower_orange = np.array([11, 119, 226])
-    upper_orange = np.array([25, 255, 255])
+    lower_orange = np.array([0, 79, 154])
+    upper_orange = np.array([14, 255, 255])
     mask = cv.inRange(hsv, lower_orange, upper_orange)
 
     # Get contours of mask.
     contours, hierarchy = cv.findContours(mask, cv.RETR_TREE, cv.CHAIN_APPROX_SIMPLE)
+    # cv.drawContours(frame, contours, -1, (0, 255, 0), 3)
+    # cv.imshow("circle", frame)
 
     # Figure out which contour is the ball if contours are found.
     if len(contours) > 0:
@@ -167,6 +172,7 @@ while True:
 
             # If no ball fits the criteria wait for the next frame.
             if ball_contour is None:
+                print("no balls found")
                 continue
 
             # Convert chosen contour into circle.
@@ -197,7 +203,7 @@ while True:
             print("circularity", circularity)
             if not rightSize:
                 continue
-            if not (0.6 <= circularity <= 1.4):
+            if not (0.1 <= circularity <= 1.4):
                 continue
             cv.circle(frame, ballPosition, int(radius), (0, 255, 0), 10)
 
@@ -206,8 +212,8 @@ while True:
         detectBounce()
         detectSide(ballPosition[0])
 
-    cv.imshow("circle", frame)
-
+    cv.imshow("circle", mask)
+    # cv.imshow("circle", frame)
 
     # With circle information, determine game state.
     # if gameState is GameStates.preServe:
@@ -239,7 +245,7 @@ while True:
     #     print("ERROR: Invalid game state!")
     #     exit()
 
-    if cv.waitKey(1) == ord('q'): break
+    if cv.waitKey(1000) == ord('q'): break
 
 videoCapture.release()
 cv.destroyAllWindows()

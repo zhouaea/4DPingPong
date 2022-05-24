@@ -7,6 +7,8 @@ name = "pypi"
 numpy = "*"
 opencv-python = "*"
 pynput = "*"
+gtts = "*"
+playsound = "*"
 
 [dev-packages]
 

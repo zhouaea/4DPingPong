@@ -6,5 +6,6 @@ CAMERA_FPS = 60
 GAME_PHASE_TIMEOUT = 3 # times are in seconds
 SERVE_SIGNAL_TIME = 2
 
+TTS_MODE = True
 MUSIC_FOLDER = 'test'
 SOUND_EFFECT_FOLDER = 'test'

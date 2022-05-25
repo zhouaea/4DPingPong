@@ -3,6 +3,7 @@ from collections import deque
 
 import constants
 import soundeffects
+from graphics import GraphicsEngine
 
 
 class GameStates(Enum):
@@ -25,7 +26,7 @@ def downOrUp(pos1, pos2):
         return -1
 
 
-class GameState:
+class GameEngine:
     def __init__(self, netX, serveHeight):
         self.netX = netX
         self.serveHeight = serveHeight
@@ -34,9 +35,11 @@ class GameState:
 
         self.ballPositions = deque(maxlen=7)
 
+        self.matchPoint = False
+
         self.leftIsServing = True
-        self.leftIsAttacking = self.leftServesFirst
-        self.ballIsLeftSide = self.leftServesFirst
+        self.leftIsAttacking = self.leftIsServing
+        self.ballIsLeftSide = self.leftIsServing
 
         self.serveHeightCounter = 0
         self.timer = 0
@@ -46,6 +49,8 @@ class GameState:
 
         self.leftScore = 0
         self.rightScore = 0
+
+        soundeffects.startBackgroundMusic()
 
     # Take a tuple of size 2 with the x and y coordinates of the ball.
     def updateState(self, ballPosition):
@@ -60,9 +65,15 @@ class GameState:
     def updateStateMachine(self, y):
         if self.currentState is GameStates.preServe:
             # TODO detect if wrong server is serving
+
+            # Turn on match point music if match point is triggered.
+            if not self.matchPoint:
+                if constants.TARGET_SCORE - self.leftScore == 1 or constants.TARGET_SCORE - self.rightScore == 1:
+                    soundeffects.startMatchPointMusic()
+
             # If a player has won, the game is finished.
-            if self.leftScore >= constants.TARGET_SCORE or self.rightScore >= constants.TARGET_SCORE:
-                soundeffects.playSoundGameEnds()
+            elif self.leftScore >= constants.TARGET_SCORE or self.rightScore >= constants.TARGET_SCORE:
+                soundeffects.playVictoryMusic()
                 self.currentState = GameStates.gameOver
 
             # Initiate the game once the ball is held above a certain position for a certain amount of time.
@@ -76,6 +87,7 @@ class GameState:
                 else:
                     self.leftIsAttacking = False
                 self.currentState = GameStates.serve
+                soundeffects.playSoundServe()
 
         elif self.currentState is GameStates.serve:
             if self.bounced:

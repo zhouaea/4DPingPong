@@ -2,6 +2,7 @@ from enum import Enum, auto
 from collections import deque
 
 import constants
+import soundeffects
 
 
 class GameStates(Enum):
@@ -33,9 +34,9 @@ class GameState:
 
         self.ballPositions = deque(maxlen=7)
 
-        self.leftServesFirst = True
-        self.ballIsLeftSide = True
-        self.leftIsAttacking = True
+        self.leftIsServing = True
+        self.leftIsAttacking = self.leftServesFirst
+        self.ballIsLeftSide = self.leftServesFirst
 
         self.serveHeightCounter = 0
         self.timer = 0
@@ -61,6 +62,7 @@ class GameState:
             # TODO detect if wrong server is serving
             # If a player has won, the game is finished.
             if self.leftScore >= constants.TARGET_SCORE or self.rightScore >= constants.TARGET_SCORE:
+                soundeffects.playSoundGameEnds()
                 self.currentState = GameStates.gameOver
 
             # Initiate the game once the ball is held above a certain position for a certain amount of time.
@@ -69,10 +71,10 @@ class GameState:
             if self.serveHeightCounter >= constants.SERVE_SIGNAL_TIME * constants.CAMERA_FPS:
                 self.serveHeightCounter = 0
                 # Figure out who should be attacking based on the score, then initiate serve phase.
-                if ((self.leftScore + self.rightScore) / constants.POINTS_UNTIL_SWITCH) % 2 == 0:
-                    self.leftIsAttacking = self.leftServesFirst  # The person who first served must be serving
+                if self.leftIsServing:
+                    self.leftIsAttacking = True
                 else:
-                    self.leftIsAttacking = not self.leftServesFirst  # the person who served second must be serving
+                    self.leftIsAttacking = False
                 self.currentState = GameStates.serve
 
         elif self.currentState is GameStates.serve:
@@ -124,6 +126,16 @@ class GameState:
             print("ERROR: Invalid game state!")
             exit()
 
+    def determineServer(self):
+        sum = self.leftScore + self.rightScore
+        if sum % constants.POINTS_UNTIL_SWITCH == 0 and sum != 0:
+            self.leftIsServing = not self.leftIsServing
+
+            if self.leftIsServing:
+                return "left to serve"
+            else:
+                return "right to serve"
+
 
     # Set bounced to true if ball has bounced, false if not.
     def detectBounce(self):
@@ -143,6 +155,7 @@ class GameState:
 
     # Set hit to true if ball has been hit, false if not.
     def detectHit(self):
+        # TODO
         pass
 
     # Set ballSideLeft depending on the side the ball is on.
@@ -166,3 +179,8 @@ class GameState:
 
         self.timer = 0
         self.currentState = GameStates.preServe
+        toServeMessage = self.determineServer()
+
+        # TODO if point was "Good", play good sound
+        # soundeffects.playSoundAfterPoint()
+        soundeffects.playSoundPreServe(self.leftScore, self.rightScore, toServeMessage)

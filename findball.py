@@ -33,8 +33,8 @@ def findBall(frame, gamestate):
 
     # Filter by orange
     hsv = cv.cvtColor(blurFrame, cv.COLOR_BGR2HSV)
-    lower_orange = np.array([11, 119, 226])
-    upper_orange = np.array([25, 255, 255])
+    lower_orange = np.array([44, 20, 117])
+    upper_orange = np.array([57, 255, 255])
     mask = cv.inRange(hsv, lower_orange, upper_orange)
 
     # Get contours of mask.

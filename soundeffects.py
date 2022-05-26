@@ -1,5 +1,3 @@
-import time
-
 from gtts import gTTS
 from playsound import playsound
 from os import path
@@ -59,8 +57,18 @@ def playSoundPreServe(leftScore, rightScore, toServe):
         myObj.save(file)
         playsound(file)
 
-def playSoundServe():
+
+def playSoundServeWarning():
+    warning = "wrong server"
+    myObj = gTTS(warning)
+    file = path.join(soundEffectsFolder, warning + ".mp3")
+    myObj.save(file)
+    playsound(file)
+
+
+def playSoundServeApproved():
     playsound(path.join(soundEffectsFolder, "ready.mp3"))
+
 
 def playSoundAfterGoodPoint():
     global soundEffectsFolder
@@ -69,3 +77,5 @@ def playSoundAfterGoodPoint():
 
 def fastShot():
     pass
+
+playSoundServeWarning()

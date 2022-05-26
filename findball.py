@@ -69,6 +69,7 @@ def findBall(frame, gamestate):
             (x, y), radius = cv.minEnclosingCircle(ball_contour)
             ballPosition = (int(x), int(y))
             radius = int(radius)
+            print(ballPosition)
             cv.circle(frame, ballPosition, radius, (0, 255, 0), 10)
         # If the ball has been found previously, choose contour that is closest to that previous location
         else:
@@ -95,6 +96,7 @@ def findBall(frame, gamestate):
                 return None
             if not (0.6 <= circularity <= 1.4):
                 return None
+            print(ballPosition)
             cv.circle(frame, ballPosition, int(radius), (0, 255, 0), 10)
 
         return ballPosition

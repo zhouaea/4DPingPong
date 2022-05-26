@@ -19,8 +19,6 @@ netX = width // 2
 tableHeight = height // 3 * 2
 serveHeight = height // 4
 
-# TODO Add serveheight calibration step. User can change line and then submit.
-
 # Initialize gamestate engine.
 game = GameEngine(netX, serveHeight)
 graphics = GraphicsEngine(height, tableHeight, width)
@@ -37,22 +35,24 @@ while True:
     cv.line(frame, (0, tableHeight), (width, tableHeight), (0, 0, 255), 3)
 
     # Find the coordinates of the circle in the frame.
-    # ballPosition = findBall(frame, game)
+    ballPosition = findBall(frame, game)
 
     # TODO Figure out what to do with gamestate if ball is not found
     # If the ball is found, update the gamestate engine.
     # if ballPosition is None:
     #     print("no circle found")
-    #     cv.imshow("no ball found", frame)
+    #     videoName = "no ball found"
     # else:
     #     game.updateState(ballPosition)
-    #     cv.imshow("ball found", frame)
+    #     videoName = "ball found"
 
     # Draw scoreboard
-    graphics.drawScore(frame, "5", "12", game.leftIsServing)
-    cv.imshow("ball found", frame)
+    # graphics.drawScore(frame, game.leftScore, game.rightScore, game.leftIsServing)
+    videoName = "test"
+    cv.imshow(videoName, frame)
 
-    if cv.waitKey(1) == ord('q'): break
+    if cv.waitKey() == ord('q'):
+        break
 
 videoCapture.release()
 cv.destroyAllWindows()

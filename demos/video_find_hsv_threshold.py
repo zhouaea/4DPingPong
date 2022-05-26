@@ -12,7 +12,7 @@ def nothing(x):
 
 
 # Initializing the webcam feed.
-video = "1.mp4"
+video = "arm.mp4"
 cap = cv2.VideoCapture(video)
 cap.set(3, 1280)
 cap.set(4, 720)
@@ -24,7 +24,7 @@ cv2.namedWindow("Trackbars")
 # H,S and V channels. The Arguments are like this: Name of trackbar,
 # window name, range,callback function. For Hue the range is 0-179 and
 # for S,V its 0-255.
-default_lower = [44, 20, 117]
+default_lower = [35, 39, 117]
 default_upper = [57, 255, 255]
 
 cv2.createTrackbar("L - H", "Trackbars", default_lower[0], 179, nothing)
@@ -80,7 +80,7 @@ while True:
 
     # If the user presses ESC then exit the program
     key = cv2.waitKey(1)
-    if key == 27:
+    if key == ord('q'):
         break
 
     # If the user presses `s` then print this array.

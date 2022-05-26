@@ -77,5 +77,3 @@ def playSoundAfterGoodPoint():
 
 def fastShot():
     pass
-
-playSoundServeWarning()

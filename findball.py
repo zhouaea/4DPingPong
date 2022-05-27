@@ -10,17 +10,14 @@ def manhattanDistance(pos1, pos2):
 
 def ballStats(contour):
     if contour is None:
-        return None, None
+        return None
 
-    perimeter = cv.arcLength(contour, True)
-    if perimeter == 0:  # avoid division by 0
-        return None, None
     area = cv.contourArea(contour)
-    circularity = 4 * pi * (area / (perimeter * perimeter))
-    return circularity, area
+    return area
+
 
 # Note: Circularity is not a good measure of the ball on low fps fast shots.
-def ballCheck(circularity, area, debug=False):
+def ballCheck(area, debug=False):
     if debug:
         print(area)
 
@@ -66,14 +63,14 @@ def findBall(frame, tableHeight, width):
         bestContour = None
         largestArea = 0
         for contour in contours:
-            _, area = ballStats(contour)
+            area = ballStats(contour)
             if area is not None and area > largestArea:
                 bestContour = contour
                 largestArea = area
 
         # Make sure selected contour isn't just noise
-        circularity, area = ballStats(bestContour)
-        if not ballCheck(circularity, area):
+        area = ballStats(bestContour)
+        if not ballCheck(area):
             print("ball selected but rejected at the end", area)
             return None
 

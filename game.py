@@ -28,7 +28,7 @@ def downOrUp(pos1, pos2):
 
 # Helper for detectHit(). Return -1 if position 1 to position 2 is going left, return 1 if it is going right.
 def leftOrRight(pos1, pos2):
-    delta = pos2[1] - pos1[1]
+    delta = pos2[0] - pos1[0]
     if delta > 0:
         return 1
     elif delta == 0:
@@ -44,7 +44,7 @@ class GameEngine:
 
         self.currentState = GameStates.preServe
 
-        self.ballPositions = deque(maxlen=7)
+        self.ballPositions = deque(maxlen=constants.MAX_STORED_BALL_POSITIONS)
 
         self.matchPoint = False
 
@@ -65,13 +65,16 @@ class GameEngine:
 
     # This is the only function called by main. It takes a tuple of size 2 with the x and y coordinates of the ball.
     def updateState(self, ballPosition):
-        self.ballPositions.append(ballPosition)
 
-        self.detectSide(ballPosition[0])
-        self.detectBounce()
-        self.detectHit()
-
-        self.updateStateMachine(ballPosition[1])
+        # If ball isn't found, just don't update the ball position but still increment timers.
+        if ballPosition is not None:
+            self.ballPositions.append(ballPosition)
+            self.detectSide(ballPosition[0])
+            self.detectBounce()
+            self.detectHit()
+            self.updateStateMachine(ballPosition[1])
+        else:
+            self.updateStateMachine(None)
 
     # Set ballSideLeft depending on the side the ball is on.
     def detectSide(self, x):
@@ -84,14 +87,17 @@ class GameEngine:
     def detectBounce(self):
         numBallPositions = len(self.ballPositions)
 
-        if numBallPositions < 7:
+        if numBallPositions < constants.MAX_STORED_BALL_POSITIONS:
             return False
 
         downUpArray = []
         for i in range(numBallPositions)[0:-1]:
             downUpArray.append(downOrUp(self.ballPositions[i], self.ballPositions[i + 1]))
 
-        self.bounced = downUpArray == [-1, -1, -1, 1, 1, 1]
+        self.bounced = downUpArray == [-1, -1, 1, 1]
+
+        print(self.ballPositions)
+        print(downUpArray)
 
         if self.bounced:
             print("ball bounced")
@@ -101,14 +107,14 @@ class GameEngine:
         # TODO more accurate hit detection would look for the paddle, currently we could mess up if there's enough backspin
         numBallPositions = len(self.ballPositions)
 
-        if numBallPositions < 7:
+        if numBallPositions < constants.MAX_STORED_BALL_POSITIONS:
             return False
 
         leftRightArray = []
         for i in range(numBallPositions)[0:-1]:
             leftRightArray.append(leftOrRight(self.ballPositions[i], self.ballPositions[i + 1]))
 
-        self.hit = leftRightArray == [-1, -1, -1, 1, 1, 1] or leftRightArray == [1, 1, 1, -1, -1, -1]
+        self.hit = leftRightArray == [-1, -1, 1, 1] or leftRightArray == [1, 1, -1, - 1]
 
         if self.hit:
             print("ball was hit")
@@ -118,8 +124,6 @@ class GameEngine:
             # TODO
             pass
         elif self.currentState is GameStates.preServe:
-            # TODO detect if wrong server is serving
-
             # Turn on match point music if match point is triggered.
             if not self.matchPoint:
                 if constants.TARGET_SCORE - self.leftScore == 1 or constants.TARGET_SCORE - self.rightScore == 1:
@@ -131,12 +135,12 @@ class GameEngine:
                 self.currentState = GameStates.gameOver
 
             # Initiate the game once the ball is held above a certain position for a certain amount of time.
-            if y >= self.serveHeight:
+            if y is not None and y <= self.serveHeight:
                 # Play a warning if the wrong person is trying to initiate a serve.
-                if self.leftIsServing != self.ballIsLeftSide:
-                    soundeffects.playSoundServeWarning()
-                else:
-                    self.serveHeightCounter += 1
+                # if self.leftIsServing != self.ballIsLeftSide:
+                #     soundeffects.playSoundServeWarning()
+                # else:
+                self.serveHeightCounter += 1
             if self.serveHeightCounter >= constants.SERVE_SIGNAL_TIME_FRAMES:
                 self.serveHeightCounter = 0
                 # Figure out who should be attacking based on the score, then initiate serve phase.

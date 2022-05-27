@@ -6,6 +6,16 @@ class GraphicsEngine:
         self.tableHeight = tableHeight
         self.width = width
 
+    def drawState(self, frame, currentStateString):
+        font = cv.FONT_HERSHEY_DUPLEX
+        text = currentStateString
+        scale = 5
+        thickness = 5
+        textSize = cv.getTextSize(text, font, scale, thickness)[0]
+        textX = 0
+        textY = 200
+        cv.putText(frame, text, (textX, textY), font, scale, (255, 255, 255), thickness)
+
     def drawScore(self, frame, leftScore, rightScore, leftIsServing):
         # Make the score of the serving side green.
         leftColor = (255, 255, 255)

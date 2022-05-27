@@ -27,7 +27,8 @@ def ballCheck(circularity, area, debug=False):
     if area is None:
         return False
 
-    if area < 500:
+    # 500 for 1920 x 1080, 25 for 640 x 480
+    if area < 25:
         return False
 
     return True
@@ -36,9 +37,15 @@ def ballCheck(circularity, area, debug=False):
 # MAIN FUNCTION
 # TODO: FIX THIS WITH GREEN BALL
 # If the ball is found, return a tuple with the x and y coordinate of the circle. Otherwise, return None.
-def findBall(frame, ballPositions):
+def findBall(frame, tableHeight, width):
     # Gaussian blur, the larger the kernel size the more blurred, not sure what sigma x is.
     blurFrame = cv.GaussianBlur(frame, (17, 17), 0)
+
+    # Don't detect ball if it is on the lower third of the screen.
+    TABLE_HEIGHT_MARGIN = 10 # in case the user places the camera slightly off
+    mask = np.zeros(frame.shape[:2], dtype="uint8")
+    cv.rectangle(mask, (0, 0), (width, tableHeight + TABLE_HEIGHT_MARGIN), 255, -1)
+    blurFrame = cv.bitwise_and(blurFrame, blurFrame, mask=mask)
 
     # Filter by green
     hsv = cv.cvtColor(blurFrame, cv.COLOR_BGR2HSV)
@@ -66,17 +73,15 @@ def findBall(frame, ballPositions):
 
         # Make sure selected contour isn't just noise
         circularity, area = ballStats(bestContour)
-        if not ballCheck(circularity, area, True):
-            print("ball selected but rejected at the end", circularity, area)
+        if not ballCheck(circularity, area):
+            print("ball selected but rejected at the end", area)
             return None
 
         # Convert chosen contour into circle.
-        print("ball found")
+        # print("ball found, area:", area)
         (x, y), radius = cv.minEnclosingCircle(bestContour)
         potentialBallPosition = (int(x), int(y))
         radius = int(radius)
-        print(potentialBallPosition)
         cv.circle(frame, potentialBallPosition, radius, (255, 0, 0), 10)
-
 
         return potentialBallPosition

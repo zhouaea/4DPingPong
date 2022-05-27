@@ -31,24 +31,22 @@ while True:
         continue
 
     # Find the coordinates of the circle in the frame.
-    ballPosition = findBall(frame, game.ballPositions)
+    ballPosition = findBall(frame, tableHeight, width)
 
     # TODO Figure out what to do with gamestate if ball is not found
     # If the ball is found, update the gamestate engine.
-    # if ballPosition is None:
-    #     print("no circle found")
-    #     videoName = "no ball found"
-    # else:
-    #     game.updateState(ballPosition)
-    #     videoName = "ball found"
+    game.updateState(ballPosition)
 
     # Draw guidelines
     cv.line(frame, (netX, 0), (netX, height), (255, 0, 0), 3)
     cv.line(frame, (0, serveHeight), (width, serveHeight), (0, 255, 0), 3)
     cv.line(frame, (0, tableHeight), (width, tableHeight), (0, 0, 255), 3)
 
+    # Test
+    graphics.drawState(frame, game.currentState.name)
+
     # Draw scoreboard
-    # graphics.drawScore(frame, game.leftScore, game.rightScore, game.leftIsServing)
+    graphics.drawScore(frame, game.leftScore, game.rightScore, game.leftIsServing)
     videoName = "test"
     cv.namedWindow(videoName, cv.WINDOW_NORMAL)
     cv.imshow(videoName, frame)

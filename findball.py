@@ -32,7 +32,6 @@ def ballCheck(area, debug=False):
 
 
 # MAIN FUNCTION
-# TODO: FIX THIS WITH GREEN BALL
 # If the ball is found, return a tuple with the x and y coordinate of the circle. Otherwise, return None.
 def findBall(frame, tableHeight, width):
     # Gaussian blur, the larger the kernel size the more blurred, not sure what sigma x is.
@@ -46,7 +45,7 @@ def findBall(frame, tableHeight, width):
 
     # Filter by green
     hsv = cv.cvtColor(blurFrame, cv.COLOR_BGR2HSV)
-    lower_green = np.array([35, 33, 117])
+    lower_green = np.array([46, 39, 117])
     upper_green = np.array([57, 255, 255])
     mask = cv.inRange(hsv, lower_green, upper_green)
 

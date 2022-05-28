@@ -6,14 +6,34 @@ class GraphicsEngine:
         self.tableHeight = tableHeight
         self.width = width
 
-    def drawState(self, frame, currentStateString):
+    def drawState(self, frame, currentStateString, bounced, hit, side, speed):
         font = cv.FONT_HERSHEY_DUPLEX
+        scale = 2
+        thickness = 2
+
         text = currentStateString
-        scale = 5
-        thickness = 5
-        textSize = cv.getTextSize(text, font, scale, thickness)[0]
+        textX = 0
+        textY = 100
+        cv.putText(frame, text, (textX, textY), font, scale, (255, 255, 255), thickness)
+
+        text = "bounced: " + str(bounced)
         textX = 0
         textY = 200
+        cv.putText(frame, text, (textX, textY), font, scale, (255, 255, 255), thickness)
+
+        text = "hit: " + str(hit)
+        textX = 0
+        textY = 300
+        cv.putText(frame, text, (textX, textY), font, scale, (255, 255, 255), thickness)
+
+        text = "leftside: " + str(side)
+        textX = 0
+        textY = 400
+        cv.putText(frame, text, (textX, textY), font, scale, (255, 255, 255), thickness)
+
+        text = "speed: " + str(speed)
+        textX = 0
+        textY = 500
         cv.putText(frame, text, (textX, textY), font, scale, (255, 255, 255), thickness)
 
     def drawScore(self, frame, leftScore, rightScore, leftIsServing):

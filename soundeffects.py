@@ -76,6 +76,9 @@ def playSoundServeApproved():
     playsound(path.join(soundEffectsFolder, "ready.mp3"), block=False)
 
 
+def playSoundFast():
+    playsound(path.join(soundEffectsFolder, "oneforall.mp3"), block=False)
+
 def playSoundAfterGoodPoint():
     global soundEffectsFolder
     playsound(path.join(soundEffectsFolder, "applause.mp3"), block=False)

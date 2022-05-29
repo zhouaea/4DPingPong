@@ -27,6 +27,8 @@ pixelsPerFeet = width / 9 # A ping pong table is 9 feet long
 game = GameEngine(netX, serveHeight, tableHeight, bounceCeiling, pixelsPerFeet)
 graphics = GraphicsEngine(height, tableHeight, width)
 
+time = 1
+
 while True:
     ret, frame = videoCapture.read()
     # if not ret:
@@ -54,7 +56,7 @@ while True:
     cv.line(frame, (0, bounceCeiling), (width, bounceCeiling), (0, 0, 255), 3)
 
     # Test
-    graphics.drawState(frame, game.currentState.name, game.bounced, game.hit, game.ballIsLeftSide, game.speed)
+    graphics.drawState(frame, game.currentState.name, game.bounced, game.hit, game.ballIsLeftSide, game.leftIsAttacking, game.speed, game.offscreen, game.timer)
 
     # Draw scoreboard
     graphics.drawScore(frame, game.leftScore, game.rightScore, game.leftIsServing)
@@ -63,8 +65,14 @@ while True:
     cv.imshow(videoName, frame)
     cv.resizeWindow(videoName, int(1920 / 2), int(1080 / 2))
 
-    if cv.waitKey() == ord('q'):
+    key = cv.waitKey(time)
+    if key == ord('q'):
         break
+    elif key == ord('p'):
+        if time == 1:
+            time = 0
+        else:
+            time = 1
 
 videoCapture.release()
 cv.destroyAllWindows()

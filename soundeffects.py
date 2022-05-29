@@ -52,14 +52,14 @@ def playSoundPreServe(leftScore, rightScore, toServe):
     if not path.exists(file):
         myObj = gTTS(score)
         myObj.save(file)
-    playsound(file)
+    playsound(file, block=False)
 
     if toServe is not None:
         file = path.join(soundEffectsFolder, toServe + ".mp3")
         if not path.exists(file):
             myObj = gTTS(toServe)
             myObj.save(file)
-        playsound(file)
+        playsound(file, block=False)
 
 
 def playSoundServeWarning():
@@ -73,16 +73,17 @@ def playSoundServeWarning():
 
 
 def playSoundServeApproved():
-    playsound(path.join(soundEffectsFolder, "ready.mp3"), block=False)
+    text = "nice serve"
+    file = path.join(soundEffectsFolder, text + ".mp3")
+    if not path.exists(file):
+        myObj = gTTS(text)
+        myObj.save(file)
+    playsound(file, block=False)
 
 
 def playSoundFast():
-    playsound(path.join(soundEffectsFolder, "oneforall.mp3"), block=False)
+    playsound(path.join(soundEffectsFolder, "bassdrop.mp3"), block=False)
 
 def playSoundAfterGoodPoint():
     global soundEffectsFolder
     playsound(path.join(soundEffectsFolder, "applause.mp3"), block=False)
-
-
-def fastShot():
-    pass

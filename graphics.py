@@ -6,7 +6,7 @@ class GraphicsEngine:
         self.tableHeight = tableHeight
         self.width = width
 
-    def drawState(self, frame, currentStateString, bounced, hit, side, speed):
+    def drawState(self, frame, currentStateString, bounced, hit, side, leftIsAttacker, speed, offscreen, timer):
         font = cv.FONT_HERSHEY_DUPLEX
         scale = 2
         thickness = 2
@@ -31,9 +31,24 @@ class GraphicsEngine:
         textY = 400
         cv.putText(frame, text, (textX, textY), font, scale, (255, 255, 255), thickness)
 
-        text = "speed: " + str(speed)
+        text = "left is attacker: " + str(leftIsAttacker)
         textX = 0
         textY = 500
+        cv.putText(frame, text, (textX, textY), font, scale, (255, 255, 255), thickness)
+
+        text = "speed: " + str(speed)
+        textX = 0
+        textY = 600
+        cv.putText(frame, text, (textX, textY), font, scale, (255, 255, 255), thickness)
+
+        text = "offscreen: " + str(offscreen)
+        textX = 0
+        textY = 700
+        cv.putText(frame, text, (textX, textY), font, scale, (255, 255, 255), thickness)
+
+        text = "timer: " + str(timer)
+        textX = 0
+        textY = 800
         cv.putText(frame, text, (textX, textY), font, scale, (255, 255, 255), thickness)
 
     def drawScore(self, frame, leftScore, rightScore, leftIsServing):
@@ -42,7 +57,7 @@ class GraphicsEngine:
         rightColor = (255, 255, 255)
         if leftIsServing:
             leftColor = (0, 255, 0)
-        else:
+        elif not leftIsServing:
             rightColor = (0, 255, 0)
 
         # Draw score centered on the left

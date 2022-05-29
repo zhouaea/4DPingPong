@@ -7,7 +7,6 @@ import soundeffects
 
 
 class GameStates(Enum):
-    preServe = auto()
     serve = auto()
     gameOver = auto()
     beforeNet = auto()
@@ -47,23 +46,23 @@ class GameEngine:
         self.bounceCeiling = bounceCeiling
         self.pixelsPerFeet = pixelsPerFeet
 
-        self.currentState = GameStates.preServe
+        self.currentState = GameStates.serve
 
         self.ballPositions = deque(maxlen=constants.MAX_STORED_BALL_POSITIONS)
         self.downUpArray = deque(maxlen=constants.MAX_STORED_BALL_POSITIONS-1)
         self.leftRightArray = deque(maxlen=constants.MAX_STORED_BALL_POSITIONS-1)
         self.ftPerSecondArray = deque(maxlen=constants.MAX_STORED_BALL_POSITIONS-1)
 
-        self.matchPoint = False
+        self.ballFoundFirstTime = False
 
         self.leftIsServing = False
-        self.leftIsAttacking = self.leftIsServing
-        self.ballIsLeftSide = self.leftIsServing
+        self.leftIsAttacking = False
+        self.ballIsLeftSide = False
 
         self.serveHeightCounter = 0
         self.timer = 0
 
-        self.wasOffScreen = False
+        self.offscreen = False
         self.bounced = False
         self.hit = False
         self.speed = 0 # feet per second
@@ -73,25 +72,31 @@ class GameEngine:
 
         self.leftScore = 0
         self.rightScore = 0
+        self.matchPoint = False
 
         soundeffects.startBackgroundMusic()
 
     # This is the only function called by main. It takes a tuple of size 2 with the x and y coordinates of the ball.
     def updateState(self, ballPosition):
         # If ball isn't found, just don't update the ball position but still increment timers.
-        if ballPosition is not None:
+        if ballPosition is None:
+            self.offscreen = True
+        else:
+            self.offscreen = False
             self.ballPositions.append(ballPosition)
             self.detectSide(ballPosition[0])
-            self.detectBounce()
-            self.detectHit()
-            self.detectSpeed()
-            self.updateStateMachine(ballPosition[1])
 
-            # Don't do comparisons between positions if the positions didn't immediately follow eachother.
-            self.wasOffScreen = False
-        else:
-            self.updateStateMachine(None)
-            self.wasOffScreen = True
+            # Initialize server by whichever side starts with the ball.
+            if not self.ballFoundFirstTime:
+                print("determining the starting server")
+                self.ballFoundFirstTime = True
+                self.leftIsServing = self.ballIsLeftSide
+
+        self.detectBounce()
+        self.detectHit()
+        self.detectSpeed()
+
+        self.updateStateMachine()
 
     # Set ballSideLeft depending on the side the ball is on.
     def detectSide(self, x):
@@ -102,7 +107,8 @@ class GameEngine:
 
     # Set bounced to true if ball has bounced, false if not.
     def detectBounce(self):
-        if self.wasOffScreen:
+        if self.offscreen:
+            self.bounced = False
             return
         elif len(self.ballPositions) > 1:
             self.downUpArray.append(downOrUp(self.ballPositions[-2], self.ballPositions[-1]))
@@ -119,29 +125,27 @@ class GameEngine:
     # Set hit to true if ball has been hit, false if not.
     def detectHit(self):
         # TODO more accurate hit detection would look for the paddle, currently we could mess up if there's enough backspin
-        if self.wasOffScreen:
+        if self.offscreen:
+            self.hit = False
             return
         elif len(self.ballPositions) > 1:
-            print(self.ballPositions[-2])
-            print(self.ballPositions[-1])
             self.leftRightArray.append(leftOrRight(self.ballPositions[-2], self.ballPositions[-1]))
 
         self.hit = self.leftRightArray == deque([-1, -1, 1, 1]) or self.leftRightArray == deque([1, 1, -1, -1])
-        print(self.leftRightArray)
-        print(self.hit)
 
     def detectSpeed(self):
-        if self.wasOffScreen:
+        if self.offscreen:
+            self.speed = 0
             return
         elif len(self.ballPositions) > 1:
             self.speed = distance(self.ballPositions[-2], self.ballPositions[-1]) / self.pixelsPerFeet * constants.CAMERA_FPS
 
 
-    def updateStateMachine(self, y):
+    def updateStateMachine(self):
         if self.currentState is GameStates.gameOver:
             # TODO
             pass
-        elif self.currentState is GameStates.preServe:
+        elif self.currentState is GameStates.serve:
             # Turn on match point music if match point is triggered.
             if not self.matchPoint:
                 if constants.TARGET_SCORE - self.leftScore == 1 or constants.TARGET_SCORE - self.rightScore == 1:
@@ -152,22 +156,10 @@ class GameEngine:
                 soundeffects.startVictoryMusic()
                 self.currentState = GameStates.gameOver
 
-            # Initiate the game once the ball is held above a certain position for a certain amount of time.
-            if y is not None and y <= self.serveHeight:
-                # Play a warning if the wrong person is trying to initiate a serve.
-                # if self.leftIsServing != self.ballIsLeftSide:
-                #     soundeffects.playSoundServeWarning()
-                # else:
-                self.serveHeightCounter += 1
-            if self.serveHeightCounter >= constants.SERVE_SIGNAL_TIME_FRAMES:
-                self.serveHeightCounter = 0
-                # Figure out who should be attacking based on the score, then initiate serve phase.
+            if self.bounced:
+                # Figure out who should be attacking based on the server, then initiate before net stage.
                 self.leftIsAttacking = self.leftIsServing
                 soundeffects.playSoundServeApproved()
-                self.currentState = GameStates.serve
-
-        elif self.currentState is GameStates.serve:
-            if self.bounced:
                 self.currentState = GameStates.beforeNet
 
         elif self.currentState is GameStates.beforeNet:
@@ -206,8 +198,14 @@ class GameEngine:
         elif self.currentState is GameStates.expectingHit:
             self.timer += 1
 
-            # If the ball bounces or is not hit in time, the new attacker loses the point.
-            if self.bounced or self.timer > constants.GAME_PHASE_TIMEOUT_FRAMES:
+            # If the ball bounces on the table a second time, the attacker loses the point.
+            if self.bounced and not self.hit:
+                print("attacker lost due to bounce on table")
+                self.attackerLosesPoint()
+
+            # If the ball is not hit in time, the new attacker loses the point.
+            if self.timer > constants.GAME_PHASE_TIMEOUT_FRAMES:
+                print("attacker lost due to timeout")
                 self.attackerLosesPoint()
 
             # If the ball is hit, the game continues.
@@ -236,7 +234,7 @@ class GameEngine:
         self.pointHadFastShot = False
         self.fastSoundNotPlayedYet = True
         self.timer = 0
-        self.currentState = GameStates.preServe
+        self.currentState = GameStates.serve
         toServeMessage = self.determineServer()
 
         soundeffects.playSoundPreServe(self.leftScore, self.rightScore, toServeMessage)

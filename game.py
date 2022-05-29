@@ -81,6 +81,8 @@ class GameEngine:
         # If ball isn't found, just don't update the ball position but still increment timers.
         if ballPosition is None:
             self.offscreen = True
+            # We need to make sure ball positions are continuous and not skipping frames.
+            self.ballPositions.clear()
         else:
             self.offscreen = False
             self.ballPositions.append(ballPosition)
@@ -88,10 +90,10 @@ class GameEngine:
 
             # Initialize server by whichever side starts with the ball.
             if not self.ballFoundFirstTime:
-                print("determining the starting server")
                 self.ballFoundFirstTime = True
                 self.leftIsServing = self.ballIsLeftSide
 
+        # If the ball goes offscreen, bounce and speed should reset but hit should recall previous directions.
         self.detectBounce()
         self.detectHit()
         self.detectSpeed()
@@ -109,6 +111,7 @@ class GameEngine:
     def detectBounce(self):
         if self.offscreen:
             self.bounced = False
+            self.downUpArray.clear()
             return
         elif len(self.ballPositions) > 1:
             self.downUpArray.append(downOrUp(self.ballPositions[-2], self.ballPositions[-1]))
@@ -163,16 +166,19 @@ class GameEngine:
                 self.currentState = GameStates.beforeNet
 
         elif self.currentState is GameStates.beforeNet:
+            # We only want to trigger the sound effect once on the attacker's side.
             if self.speed > constants.FAST_SPEED and self.fastSoundNotPlayedYet:
+                print("fast shot")
                 soundeffects.playSoundFast()
                 self.fastSoundNotPlayedYet = False
+                self.pointHadFastShot = True
 
             # While the ball is on the side of the attacker, look for a timeout or a bounce to determine if they missed.if
             if self.leftIsAttacking == self.ballIsLeftSide:
                 self.timer += 1
             else:
                 self.timer = 0
-                self.fastSoundNotPlayedYet = False
+                self.fastSoundNotPlayedYet = True
                 self.currentState = GameStates.overNet
             if self.bounced or self.timer > constants.GAME_PHASE_TIMEOUT_FRAMES:
                 self.attackerLosesPoint()

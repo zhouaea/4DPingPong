@@ -74,7 +74,8 @@ class GameEngine:
         self.rightScore = 0
         self.matchPoint = False
 
-        soundeffects.startBackgroundMusic()
+        # Play menu music upon initialization.
+        soundeffects.startMenuMusic()
 
     # This is the only function called by main. It takes a tuple of size 2 with the x and y coordinates of the ball.
     def updateState(self, ballPosition):
@@ -92,6 +93,8 @@ class GameEngine:
             if not self.ballFoundFirstTime:
                 self.ballFoundFirstTime = True
                 self.leftIsServing = self.ballIsLeftSide
+                # Start background music once ball is found.
+                soundeffects.startBackgroundMusic()
 
         # If the ball goes offscreen, bounce and speed should reset but hit should recall previous directions.
         self.detectBounce()
@@ -116,7 +119,7 @@ class GameEngine:
         elif len(self.ballPositions) > 1:
             self.downUpArray.append(downOrUp(self.ballPositions[-2], self.ballPositions[-1]))
 
-        self.bounced = self.downUpArray == deque([-1, -1, 1, 1])
+        self.bounced = self.downUpArray == deque([-1, -1, 1, 1]) or self.downUpArray == deque([-1, -1, 0, 1])
 
     # Returns true is ball is within the bounce zone.
     def inBounceZone(self):

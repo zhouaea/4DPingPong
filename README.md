@@ -1,17 +1,24 @@
 # 4DPingPong
 
-# Required Sound Effects:
-- confirm-preserve.mp3
-  - wii sports whistle
-- match-finished.mp3
-  - game set match
-- After point
-  - clap after good point
-  - score
-  - side to serve on switch
-- during fast shot
-  - bass boost
-- hitting a fast shot back with another fast shot
-  - lower bass boost
-- barely returning a fast shot
-  - gasp
+# Wii Sports Sound Effects:
+- startMenuMusic():
+  - Wii Fitness - Test OST | Wii Sports
+- startBackgroundMusic():
+  - Tennis - Select Position OST | Wii Sports
+- startMatchPointMusic():
+  - Wii Sports Music - Tennis Training
+- startVictoryMusic():
+  - Wii Sports - Music - Tennis Results
+- playSoundGameEnds() - tts:
+  - Wii Tennis Sample 23
+  - Wii Crowd Slow Clap
+- playSoundPreServe() - tts:
+- playSoundServeWarning() - tts:
+- playSoundServeApproved():
+  - Wii Golf Sample 47
+- playSoundFast():
+  - Golf announcer nice shot
+- playSoundSave():
+  - TODO
+- playSoundAfterGoodPoint():
+  - Wii Sports Crowd Slow Clap

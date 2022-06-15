@@ -24,8 +24,8 @@ def ballCheck(area, debug=False):
     if area is None:
         return False
 
-    # 500 for 1920 x 1080, 25 for 640 x 480
-    if area < 25:
+    # 500 for 1920 x 1080, 0.5 for 640 x 480
+    if area < 0.5:
         return False
 
     return True
@@ -45,7 +45,7 @@ def findBall(frame, tableHeight, width):
 
     # Filter by green
     hsv = cv.cvtColor(blurFrame, cv.COLOR_BGR2HSV)
-    lower_green = np.array([46, 39, 117])
+    lower_green = np.array([31, 39, 117])
     upper_green = np.array([57, 255, 255])
     mask = cv.inRange(hsv, lower_green, upper_green)
 
@@ -74,7 +74,7 @@ def findBall(frame, tableHeight, width):
             return None
 
         # Convert chosen contour into circle.
-        # print("ball found, area:", area)
+        print("ball found, area:", area)
         (x, y), radius = cv.minEnclosingCircle(bestContour)
         potentialBallPosition = (int(x), int(y))
         radius = int(radius)

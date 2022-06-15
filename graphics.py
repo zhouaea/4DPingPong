@@ -7,6 +7,8 @@ class GraphicsEngine:
         self.width = width
 
     def drawState(self, frame, currentStateString, bounced, hit, side, leftIsAttacker, speed, offscreen, timer):
+        # TODO scale to any resolution
+
         font = cv.FONT_HERSHEY_DUPLEX
         scale = 2
         thickness = 2

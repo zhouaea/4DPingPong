@@ -12,7 +12,7 @@ def nothing(x):
 
 
 # Initializing the webcam feed.
-video = "point 1.mp4"
+video = 1
 cap = cv2.VideoCapture(video)
 cap.set(3, 1280)
 cap.set(4, 720)
@@ -24,7 +24,7 @@ cv2.namedWindow("Trackbars")
 # H,S and V channels. The Arguments are like this: Name of trackbar,
 # window name, range,callback function. For Hue the range is 0-179 and
 # for S,V its 0-255.
-default_lower = [46, 39, 117]
+default_lower = [31, 39, 117]
 default_upper = [57, 255, 255]
 
 cv2.createTrackbar("L - H", "Trackbars", default_lower[0], 179, nothing)

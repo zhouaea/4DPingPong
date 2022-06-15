@@ -10,8 +10,10 @@ from game import GameEngine
 from graphics import GraphicsEngine
 from findball import findBall
 
-video = "ping pong point 1 60 fps.mp4"
-videoCapture = cv.VideoCapture(video)
+video = 1
+videoCapture = cv.VideoCapture(video, apiPreference=cv.CAP_ANY, params=[
+    cv.CAP_PROP_FRAME_WIDTH, 1280,
+    cv.CAP_PROP_FRAME_HEIGHT, 1024])
 
 # Establish video parameters
 ret, frame = videoCapture.read()
@@ -31,16 +33,18 @@ time = 1
 
 while True:
     ret, frame = videoCapture.read()
+    frame = cv.flip(frame, 1)
+
     # if not ret:
     #     videoCapture = cv.VideoCapture(video)
     #     continue
 
-    # If recording is messed up
-    M = np.float32([
-        [1, 0, 0],
-        [0, 1, -250]
-    ])
-    frame = cv.warpAffine(frame, M, (frame.shape[1], frame.shape[0]))
+    # If recording position is messed up
+    # M = np.float32([
+    #     [1, 0, 0],
+    #     [0, 1, -175]
+    # ])
+    # frame = cv.warpAffine(frame, M, (frame.shape[1], frame.shape[0]))
 
     # Find the coordinates of the circle in the frame.
     ballPosition = findBall(frame, tableHeight, width)
@@ -61,16 +65,16 @@ while True:
     # Draw scoreboard
     graphics.drawScore(frame, game.leftScore, game.rightScore, game.leftIsServing)
     videoName = "test"
-    cv.namedWindow(videoName, cv.WINDOW_NORMAL)
+    # cv.namedWindow(videoName, cv.WINDOW_NORMAL)
     cv.imshow(videoName, frame)
-    cv.resizeWindow(videoName, int(1920 / 2), int(1080 / 2))
+    # cv.resizeWindow(videoName, int(1920 / 2), int(1080 / 2))
 
     key = cv.waitKey(time)
     if key == ord('q'):
         break
     elif key == ord('p'):
         if time == 1:
-            time = 0
+            time = 1
         else:
             time = 1
 

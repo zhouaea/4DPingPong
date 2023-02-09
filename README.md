@@ -12,6 +12,8 @@ I opted for a much simpler color filtering method, which mostly worked. There we
 
 To follow the flow of the game (ex: who's serving? who hit the ball? who just won/lost the point? how many points does each person have?), I implemented a ping pong state machine algorithm mostly based on what was done by some [grad students at Cornell](http://people.ece.cornell.edu/land/courses/ece5760/FinalProjects/s2015/ttt/ttt/ttt/index.html). With ball tracking and game state tracking out of the way, I could finally make ping pong "4D"!
 
+![ping pong demo](https://user-images.githubusercontent.com/75145715/217930320-cd5a3613-3a3e-434f-88ac-e7876c0962bf.gif)
+
 ## Augmenting the game
 My first instinct was to do the electric fan idea described above, but since I didn't actually own any fans, I decided to start small and add interactive sound effects like you might see in a video game. Below is an example of some events I coded, using the nostalgic sound design of Wii Sports:
 - startMenuMusic(): Wii Fitness - Test OST | Wii Sports
@@ -34,5 +36,3 @@ I tried this program with friends and family and it actually made playing more f
 I only spent three weeks on this over the summer for fun, but I can see this technology having serious potential. As personal computers become more powerful, and with some professional polish, a 4d ping pong application could become a reality for consumers.
 
 -Neo Zhou, Boston College Class of 2024
-
-I didn't record any live gameplay for the sake of privacy of the people I played with, but here's a [video of me testing the system](https://user-images.githubusercontent.com/75145715/217918975-60e2365e-ac37-4d2e-826e-030fc64ae6b5.mp4)

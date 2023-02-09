@@ -32,5 +32,4 @@ I only spent three weeks on this over the summer for fun, but I can see this tec
 
 -Neo Zhou, Boston College Class of 2024
 
-I didn't record any live gameplay for the sake of privacy of the people I played with, but here's a [video of me testing the system]
-(https://user-images.githubusercontent.com/75145715/217918975-60e2365e-ac37-4d2e-826e-030fc64ae6b5.mp4)
+I didn't record any live gameplay for the sake of privacy of the people I played with, but here's a [video of me testing the system](https://user-images.githubusercontent.com/75145715/217918975-60e2365e-ac37-4d2e-826e-030fc64ae6b5.mp4)
